@@ -1,0 +1,213 @@
+import sys
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QLineEdit, QPushButton, QFormLayout, QTextEdit, QProgressBar
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
+from PyQt5.QtGui import QIcon, QFont
+from random import choice
+
+class WorkerThread(QThread):
+    result_ready = pyqtSignal(str)
+
+    def __init__(self, question):
+        super().__init__()
+        self.question = question
+
+    def run(self):
+        answer = self.get_answer(self.question)
+        self.result_ready.emit(answer)
+
+    def get_answer(self, question):
+        question = question.lower()
+        
+        if 'missão' in question:
+            return ("A EcoPur é líder em soluções sustentáveis de purificação de água, focada em saúde, qualidade de vida e proteção ambiental. "
+                    "Nossa missão é oferecer soluções inovadoras em purificação de água, promovendo saúde e sustentabilidade para uma vida melhor. "
+                    "Nossa visão é proporcionar água limpa e segura para todos, contribuindo para um mundo mais saudável e sustentável.")
+        
+        elif 'valores' in question:
+            return ("Nossa política e valores se baseiam na qualidade, segurança, satisfação do cliente e proteção ambiental. "
+                    "Priorizamos a inovação, sustentabilidade, ética, colaboração, excelência, transparência e responsabilidade social.")
+        
+        elif 'investimento' in question:
+            return ("Custos mensais: \n- Fixos: R$ 23.000 (aluguel, impostos, manutenção)\n- Variáveis: R$ 25.000 (matéria-prima, mão de obra)\n"
+                    "- Operacionais: R$ 14.000 (marketing, vendas, distribuição)\n- Financeiros: R$ 13.000 (juros, despesas bancárias)\n"
+                    "Investimentos: \n- Financeiros: R$ 50.000\n- Não financeiros: R$ 500.000\n- Estratégicos: R$ 200.000\n"
+                    "- Sociais e ambientais: R$ 20.000\nGasto total: R$ 845.000.")
+        
+        elif 'produtos' in question:
+            return ("Oferecemos vários produtos: \n- Filtro de água portátil (R$ 119,90)\n- Filtros de Água Portáteis EcoFiltro para uso diário. \n"
+                    "- Sistema de purificação para casas EcoPur Casa (R$ 199,99).\n- Estações de purificação comunitárias EcoPur Comunidade (Sob consulta). "
+                    "Todos os nossos produtos utilizam tecnologia avançada de purificação e possuem vantagens como a redução de resíduos plásticos e melhoria da qualidade de vida.")
+        
+        elif 'estratégia' in question:
+            return ("Nossa estratégia é focada em: \n- Parcerias com ONGs ambientais e empresas de tecnologia.\n"
+                    "- Expansão internacional e desenvolvimento de novos produtos. \n- Foco em marketing digital e campanhas sustentáveis.")
+        
+        elif 'política' in question:
+            return ("Priorizamos a qualidade, segurança, satisfação do cliente e proteção ambiental. "
+                    "Nosso compromisso é com a inovação, sustentabilidade, ética, colaboração, excelência e transparência.")
+        
+        elif 'objetivos' in question:
+            return ("Nosso objetivo é atender pessoas de 25 a 50 anos, com foco na saúde e no meio ambiente. "
+                    "Buscamos aumentar nossa receita em 15% ao ano, reduzir custos em 10%, e investir continuamente em expansão e inovação.")
+        
+        elif 'contato' in question:
+            return ("Nosso contato é: \n- Telefone: (11) 99570-7588\n- Email: ecopurbrasil@gmail.com\n- Instagram: Ecopur_oficial.")
+        
+        else:
+            return "Desculpe, não entendi sua pergunta. Tente perguntar sobre nossa missão, valores, produtos ou política."
+
+class EcoPurApp(QWidget):
+    def __init__(self, username):
+        super().__init__()
+        self.username = username
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle(f"EcoPur - Bem-vindo, {self.username}!")
+        self.setGeometry(100, 100, 850, 650)
+        self.setStyleSheet("background-color: #F4F7F6;")
+        self.setFont(QFont("Arial", 12))
+
+        layout = QVBoxLayout()
+
+        self.title_label = QLabel(f"Olá, {self.username}!")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-size: 28px; font-weight: bold; color: #1E3A3D; margin-bottom: 20px;")
+        layout.addWidget(self.title_label)
+
+        self.suggestions_label = QLabel("Pergunte sobre:\n- Missão\n- Valores\n- Investimentos\n- Produtos\n- Estratégia\n- Política")
+        self.suggestions_label.setAlignment(Qt.AlignCenter)
+        self.suggestions_label.setStyleSheet("font-size: 18px; color: #333333; margin-bottom: 10px;")
+        layout.addWidget(self.suggestions_label)
+
+        self.question_label = QLabel("Digite sua pergunta:")
+        self.question_label.setStyleSheet("font-size: 14px; color: #1E3A3D;")
+        layout.addWidget(self.question_label)
+
+        self.question_entry = QLineEdit(self)
+        self.question_entry.setPlaceholderText("Digite aqui sua pergunta...")
+        self.question_entry.setStyleSheet("font-size: 16px; padding: 10px; border-radius: 10px; background-color: #FFFFFF;")
+        layout.addWidget(self.question_entry)
+
+        self.ask_button = QPushButton("Perguntar", self)
+        self.ask_button.setStyleSheet("font-size: 16px; background-color: #5C8C7D; color: white; border-radius: 10px; padding: 10px;")
+        self.ask_button.clicked.connect(self.get_answer)
+        layout.addWidget(self.ask_button)
+
+        self.answer_text = QTextEdit(self)  
+        self.answer_text.setPlaceholderText("Aqui aparecerá a resposta...")
+        self.answer_text.setStyleSheet("font-size: 14px; padding: 10px; background-color: #FFFFFF;")
+        self.answer_text.setReadOnly(True)
+        layout.addWidget(self.answer_text)
+
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setRange(0, 0)  
+        layout.addWidget(self.progress_bar)
+
+        self.setLayout(layout)
+
+    def get_answer(self):
+        question = self.question_entry.text().strip()
+        if question:
+            self.progress_bar.setRange(0, 0)
+            self.progress_bar.setValue(0)
+            self.answer_text.setText("Consultando...")
+
+            self.worker_thread = WorkerThread(question)
+            self.worker_thread.result_ready.connect(self.display_answer)
+            self.worker_thread.start()
+        else:
+            self.answer_text.setText("Por favor, digite uma pergunta válida.")
+
+    def display_answer(self, answer):
+        self.animate_answer(answer)
+
+    def animate_answer(self, answer):
+        # Animação da resposta aparecendo aos poucos
+        self.answer_text.clear()
+        for i in range(len(answer)):
+            QTimer.singleShot(i * 50, lambda i=i: self.append_text(answer[i]))
+
+    def append_text(self, text):
+        self.answer_text.insertPlainText(text)
+
+class LoginWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
+
+    def init_ui(self):
+        self.setWindowTitle("Login - EcoPur")
+        self.setGeometry(100, 100, 400, 300)
+        self.setStyleSheet("background-color: #F4F7F6;")
+
+        layout = QVBoxLayout()
+
+        self.title_label = QLabel("Bem-vindo à EcoPur!")
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setStyleSheet("font-size: 24px; font-weight: bold; color: #1E3A3D; margin-bottom: 20px;")
+        layout.addWidget(self.title_label)
+
+        form_layout = QFormLayout()
+
+        self.username_entry = QLineEdit(self)
+        self.username_entry.setPlaceholderText("Digite seu nome de usuário")
+        self.username_entry.setStyleSheet("""
+            font-size: 16px; 
+            padding: 10px; 
+            border-radius: 10px; 
+            background-color: #FFFFFF; 
+            border: 2px solid #B4B8B1;
+        """)
+        form_layout.addRow("Usuário", self.username_entry)
+
+        self.password_entry = QLineEdit(self)
+        self.password_entry.setPlaceholderText("Digite sua senha")
+        self.password_entry.setEchoMode(QLineEdit.Password)
+        self.password_entry.setStyleSheet("""
+            font-size: 16px; 
+            padding: 10px; 
+            border-radius: 10px; 
+            background-color: #FFFFFF; 
+            border: 2px solid #B4B8B1;
+        """)
+        form_layout.addRow("Senha", self.password_entry)
+
+        layout.addLayout(form_layout)
+
+        self.login_button = QPushButton("Login", self)
+        self.login_button.setStyleSheet("""
+            font-size: 16px; 
+            background-color: #5C8C7D; 
+            color: white; 
+            border-radius: 10px; 
+            padding: 10px;
+        """)
+        self.login_button.clicked.connect(self.login)
+        layout.addWidget(self.login_button)
+
+        self.setLayout(layout)
+
+    def login(self):
+        username = self.username_entry.text().strip()
+        password = self.password_entry.text().strip()
+
+        if username and password:
+            self.close()  # Fecha a janela de login
+            self.app = EcoPurApp(username)
+            self.app.show()
+        else:
+            self.show_error("Por favor, preencha todos os campos.")
+
+    def show_error(self, message):
+        self.error_label = QLabel(message)
+        self.error_label.setStyleSheet("font-size: 14px; color: red;")
+        self.error_label.setAlignment(Qt.AlignCenter)
+        self.layout().addWidget(self.error_label)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    login_window = LoginWindow()
+    login_window.show()
+    sys.exit(app.exec_())
